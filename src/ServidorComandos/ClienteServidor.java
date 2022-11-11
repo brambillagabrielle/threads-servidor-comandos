@@ -61,6 +61,7 @@ public class ClienteServidor extends Thread {
                     new InputStreamReader(System.in)
             );
             
+            System.out.println("Entre com os comandos para serem executados: ");
             System.out.println("# ");
             
             Thread thread = new ClienteServidor(conexao);
