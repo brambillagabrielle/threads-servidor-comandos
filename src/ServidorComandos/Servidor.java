@@ -54,7 +54,11 @@ public class Servidor extends Thread {
         
         try {
             
-            Process processo = Runtime.getRuntime().exec(comando);
+            // WINDOWS:
+            Process processo = Runtime.getRuntime().exec("cmd /c " + comando);
+            
+            // LINUX:
+            // Process processo = Runtime.getRuntime().exec(comando);
             StringBuilder saidaComando = new StringBuilder(); 
 
             BufferedReader leitor = new BufferedReader(
@@ -71,7 +75,7 @@ public class Servidor extends Thread {
                 System.out.println("Comando executado com sucesso");
                 saida.println(saidaComando);
             } else {
-                saida.println("Erro");
+                saida.println("Erro\n");
             }
             
         } catch(InterruptedException | IOException e) {
@@ -82,7 +86,7 @@ public class Servidor extends Thread {
     
     public static void main(String args[]) {
         
-        System.out.println("Servidor para execução de comandos");
+        System.out.println("* Servidor Terminal *");
         
         clientes = new ArrayList<>();
         
