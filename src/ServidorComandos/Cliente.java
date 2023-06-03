@@ -1,36 +1,89 @@
 package ServidorComandos;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-public class Cliente {
+public class Cliente extends Thread {
     
-    private String ip;
-    private Socket socket;
-    private PrintStream saida;
+    private static boolean terminado = false;
+    private final Socket conexao;
 
-    public String getIp() {
-        return ip;
+    public Cliente(Socket conexao) {
+        this.conexao = conexao;
     }
-
-    public void setIp(String ip) {
-        this.ip = ip;
+    
+    @Override
+    public void run() {
+        
+        try {
+        
+            BufferedReader entrada = new BufferedReader(
+                    new InputStreamReader(
+                          conexao.getInputStream()
+                    )
+            );
+                
+            String linha;
+            while (true) {
+                
+                linha = entrada.readLine();
+                
+                if (linha == null) {
+                    System.out.println("Fim da conexão");
+                    break;
+                }
+                
+                System.out.println(linha);
+                
+            }
+            
+        } catch (IOException e) {
+            System.out.println("IOException: " + e);
+        }
+        
+        terminado = true;
+        
     }
+    
+    public static void main(String args[]) {
+        
+        try {
+            
+            Socket conexao = new Socket("127.0.0.1", 1234);
 
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-    }
-
-    public PrintStream getSaida() {
-        return saida;
-    }
-
-    public void setSaida(PrintStream saida) {
-        this.saida = saida;
+            PrintStream saida = new PrintStream(
+                    conexao.getOutputStream()
+            );
+            BufferedReader teclado = new BufferedReader(
+                    new InputStreamReader(System.in)
+            );
+            
+            System.out.println("Entre com os comandos para serem executados: ");
+            System.out.println("# ");
+            
+            Thread thread = new ClienteServidor(conexao);
+            thread.start();
+            
+            String linha;
+            while(true) {
+                
+                linha = teclado.readLine();
+                
+                if(terminado) {
+                    break;
+                }
+                
+                saida.println(linha);
+                
+            }
+            
+        } catch (IOException e) {
+            System.out.println("IOException: " + e);
+        }
+        
     }
     
 }
